@@ -67,7 +67,7 @@
     enable = true;
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
-      qt6Packages.fcitx5-chinese-addons  # 官方中文拼音引擎
+      #qt6Packages.fcitx5-chinese-addons  # 官方中文拼音引擎
       fcitx5-gtk                         # 增强在 GTK 程序中的输入体验
       fcitx5-rime                        # 核心组件：引入 Rime 引擎
     ];
