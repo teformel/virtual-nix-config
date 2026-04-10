@@ -30,6 +30,17 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # 开启 SSH 服务，打通物理机与虚拟机的任督二脉
+  services.openssh = {
+    enable = true;
+    settings = {
+      # 允许密码登录（因为我们还没配密钥）
+      PasswordAuthentication = true;
+      # 拒绝 root 用户直接登录（安全好习惯）
+      PermitRootLogin = "no";
+    };
+  };
+
   # Enable network manager applet
   programs.nm-applet.enable = true;
 
@@ -49,6 +60,25 @@
     LC_PAPER = "zh_CN.UTF-8";
     LC_TELEPHONE = "zh_CN.UTF-8";
     LC_TIME = "zh_CN.UTF-8";
+  };
+
+  # 系统语言与中文输入法支持 (Fcitx5)
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      qt6Packages.fcitx5-chinese-addons  # 官方中文拼音引擎
+      fcitx5-gtk                         # 增强在 GTK 程序中的输入体验
+      fcitx5-rime                        # 核心组件：引入 Rime 引擎
+    ];
+  };
+
+  # 强制全局注入 Fcitx5 环境变量，专治 i3wm 各种不服
+  environment.sessionVariables = {
+    GLFW_IM_MODULE = "ibus"; # 顺手解决一些游戏/图形库的输入问题
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
   };
 
   services.xserver = {
@@ -78,6 +108,17 @@
     layout = "cn";
     variant = "";
   };
+
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    wqy_microhei
+    wqy_zenhei
+    nerd-fonts.fira-code  # 最受程序员欢迎的连字代码字体 FiraCode 的 Nerd 版
+    nerd-fonts.meslo-lg      # 另一个非常好看的终端字体
+  ];
+
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -118,15 +159,6 @@
     #hashedPassword = "$6$hnQqq.qZqnTZvLyx$3I.tDiuePXkQWDFaHfisK8ZSvwiX6jHckJM35xUcNaq7FtPhsNB5wbMcvOVxS9.Sh9/CLOddtGudDmBDrRJOY/";
   };
 
-  fonts.packages = with pkgs; [
-  	noto-fonts
-  	noto-fonts-cjk-sans
-  	noto-fonts-cjk-serif
-  	wqy_microhei
-  	wqy_zenhei
-  	nerd-fonts.fira-code
-  ];
-
   # Install firefox.
   programs.firefox.enable = true;
 
@@ -136,8 +168,9 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    wget
+    curl
     micro
     eza
     git
